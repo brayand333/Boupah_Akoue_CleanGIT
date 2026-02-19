@@ -1,0 +1,30 @@
+name: Build Info on Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-artifact:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create build info file
+        run: |
+          echo "Build date: $(date '+%Y-%m-%d %H:%M:%S UTC')" > build_info.txt
+          echo "Branch: ${{ github.ref_name }}" >> build_info.txt
+          echo "Commit: ${{ github.sha }}" >> build_info.txt
+
+      - name: Upload build_info as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-info
+          path: build_info.txt
+          if-no-files-found: error
+          retention-days: 7
+
+
